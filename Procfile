@@ -1,1 +1,1 @@
-worker: bin/yourcoffin
+worker: bin/reverse-proxy
