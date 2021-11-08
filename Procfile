@@ -1,1 +1,1 @@
-worker: bin/reverse-proxy
+web: bin/reverse-proxy
