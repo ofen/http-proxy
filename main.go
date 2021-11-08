@@ -30,20 +30,19 @@ func main() {
 		log.Fatal(err)
 	}
 
+	handler := func(p *httputil.ReverseProxy) func(http.ResponseWriter, *http.Request) {
+		return func(w http.ResponseWriter, r *http.Request) {
+			log.Println(r.URL)
+			r.Host = remote.Host
+			p.ServeHTTP(w, r)
+		}
+	}
+
 	proxy := httputil.NewSingleHostReverseProxy(remote)
-	http.Handle("/", &proxyHandler{proxy})
+	http.HandleFunc("/", handler(proxy))
 
 	log.Printf("proxying requests to %s on port %d ...", remote.String(), port)
 	if err = http.ListenAndServe(":"+strconv.Itoa(port), nil); err != nil {
 		log.Fatal(err)
 	}
-}
-
-type proxyHandler struct {
-	p *httputil.ReverseProxy
-}
-
-func (h *proxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.URL)
-	h.p.ServeHTTP(w, r)
 }
